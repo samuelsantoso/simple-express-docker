@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const logger
     = require('morgan');
 const mongoose = require('mongoose');
+require('dotenv').config();
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -20,7 +21,8 @@ mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/test')
     .then(() => {
         console.log('mongodb started.');
     }).catch(() => {
-    console.log('Mongodb connection failed.');
+        console.log(process.env.DATABASE_URL);
+    console.log('Mongodb connection failed.',process.env.DATABASE_URL);
 });
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
