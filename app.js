@@ -17,13 +17,17 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 app.use(logger('dev'));
-mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/test')
-    .then(() => {
-        console.log('mongodb started.');
-    }).catch(() => {
-        console.log(process.env.DATABASE_URL);
-    console.log('Mongodb connection failed.',process.env.DATABASE_URL);
-});
+
+const connectWithRetry = function () {
+    return mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/test', function (err) {
+        if (err) {
+            console.error('Failed to connect to mongo on startup - retrying in 5 sec', err);
+            setTimeout(connectWithRetry, 5000);
+        }
+    });
+};
+
+connectWithRetry();
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
